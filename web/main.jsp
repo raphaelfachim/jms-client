@@ -11,43 +11,52 @@
 <%@page import="javax.jms.Queue"%>
 <%@page import="javax.naming.InitialContext"%>
 <%@page import="javax.naming.Context"%>
-<%
-    String idMensagem = "PC06";
-    String data = "20220101";
-%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>JMS - sys</title>
     </head>
     <body>
         <form action="main.jsp">
-		Booking Person Name: 
-                <Input name="BookerName" type="text" size="25" value="<%=idMensagem%>" ><br>
-		Weight of Shipment:
-                <Input name="ShipmentWt" type="text" size="5" value="<%=data%>" > in Kg <br>
-		<INPUT type="submit" name="todo" value="Book Shipment">
-		<p>Once you get your Shipment Number, call our agent and give the Number for Free Shipping.</p>
-		<p>Note: Getting Shipment Number may take a while!</p>
-		<br>
+		Código da mensagem: 
+                <Input name="codigoMensagem" type="text" size="5" value="PL"><br>
+		Código da Placa/Bobina:
+                <Input name="codigoProduto" type="text" size="5"><br>
+		Peso:
+                <Input name="peso" type="number" size="5"><br>
+		Largura:
+                <Input name="largura" type="number" size="5"><br>
+		Comprimento:
+                <Input name="comprimento" type="number" size="5"><br>
+		Espessura:
+                <Input name="espessura" type="number" size="5"><br>
+		<INPUT type="submit" name="todo" value="Enviar">
 	</form>
                 
     <%
 	//Sample 9.08: Get Request Form Field Data
-	String BookingPerson = request.getParameter("BookerName");
-	String CarryWt = request.getParameter("ShipmentWt");
+	String codigoMensagem = request.getParameter("codigoMensagem");
+	String codigoProduto = request.getParameter("codigoProduto");
+        Float peso = Float.valueOf(request.getParameter("peso"));
+        Float largura = Float.valueOf(request.getParameter("largura"));
+        Float comprimento = Float.valueOf(request.getParameter("comprimento"));
+        Float espessura = Float.valueOf(request.getParameter("espessura"));
 	
 	//Sample 9.09 Check we have Valid Request
-	if (BookingPerson != null 
-			&& BookingPerson.trim().length() > 0
-			&& CarryWt != null
-			&& CarryWt.trim().length() > 0)
+	if (codigoMensagem != null && codigoMensagem.trim().length() > 0
+			&& codigoProduto != null && codigoProduto.trim().length() > 0
+                        && peso != null && peso > 0.0
+                        && largura != null && largura > 0.0
+                        && comprimento != null && comprimento > 0.0
+                        && espessura != null && espessura > 0.0
+                )
 	{
 		//Sample 9.10: Get JMS Queue 
 		Context ctx = new InitialContext(System.getProperties());
-		Queue ShipmentQueue = (javax.jms.Queue) ctx.lookup("java:/jms/queue/MQ_ACI_COND_N3_CPCS");
+		Queue ShipmentQueue = (javax.jms.Queue) ctx.lookup("java:/jms/queue/myDestination");
 		
 		//Sample 9.11: Get the connection
 		ConnectionFactory factory = 
@@ -56,7 +65,7 @@
 		Session JmsSession = JmsCon.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		
 		//Sample 9.12: Format the Message String
-		String mes = BookingPerson + CarryWt ;
+		String mes = codigoMensagem + ";" + codigoProduto + ";" + peso + ";" + largura + ";" + comprimento + ";" + espessura ;
 		
 		//Sample 9.13: Post Message Data to the Queue
 		MessageProducer sender = JmsSession.createProducer(ShipmentQueue);
@@ -65,8 +74,6 @@
 		
 		//Sample 9.14: Now Post the message to Shipment Queue on the Server
 		sender.send(TextMsg);
-		out.println("<h1>Shipment Request Posted.</h1>");
-		out.println("<h3><em>Login Tomorrow to get your free Shipment Id</em></h1>");
 	}
     %>
     </body>
