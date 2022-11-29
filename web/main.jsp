@@ -24,34 +24,35 @@
 		Código da mensagem: 
                 <Input name="codigoMensagem" type="text" size="5" value="PL"><br>
 		Código da Placa/Bobina:
-                <Input name="codigoProduto" type="text" size="5"><br>
+                <Input name="codigoProduto" type="text" size="5" value="PL01"><br>
 		Peso:
-                <Input name="peso" type="number" size="5"><br>
+                <Input name="peso" type="number" size="5" value="10005"><br>
 		Largura:
-                <Input name="largura" type="number" size="5"><br>
+                <Input name="largura" type="number" size="5" value="4000"><br>
 		Comprimento:
-                <Input name="comprimento" type="number" size="5"><br>
+                <Input name="comprimento" type="number" size="5" value="12000"><br>
 		Espessura:
-                <Input name="espessura" type="number" size="5"><br>
-		<INPUT type="submit" name="todo" value="Enviar">
+                <Input name="espessura" type="number" size="5" value="25"><br>
+                
+		<Input type="submit" name="todo" value="Enviar">
 	</form>
                 
     <%
-	//Sample 9.08: Get Request Form Field Data
+//	//Sample 9.08: Get Request Form Field Data
 	String codigoMensagem = request.getParameter("codigoMensagem");
 	String codigoProduto = request.getParameter("codigoProduto");
-        Float peso = Float.valueOf(request.getParameter("peso"));
-        Float largura = Float.valueOf(request.getParameter("largura"));
-        Float comprimento = Float.valueOf(request.getParameter("comprimento"));
-        Float espessura = Float.valueOf(request.getParameter("espessura"));
+        String peso = request.getParameter("peso");
+        String largura = request.getParameter("largura");
+        String comprimento = request.getParameter("comprimento");
+        String espessura = request.getParameter("espessura");
 	
-	//Sample 9.09 Check we have Valid Request
+//	//Sample 9.09 Check we have Valid Request
 	if (codigoMensagem != null && codigoMensagem.trim().length() > 0
 			&& codigoProduto != null && codigoProduto.trim().length() > 0
-                        && peso != null && peso > 0.0
-                        && largura != null && largura > 0.0
-                        && comprimento != null && comprimento > 0.0
-                        && espessura != null && espessura > 0.0
+                        && peso != null && peso.trim().length() > 0
+                        && largura != null && largura.trim().length() > 0
+                        && comprimento != null && comprimento.trim().length() > 0
+                        && espessura != null && espessura.trim().length() > 0
                 )
 	{
 		//Sample 9.10: Get JMS Queue 
@@ -75,6 +76,10 @@
 		//Sample 9.14: Now Post the message to Shipment Queue on the Server
 		sender.send(TextMsg);
 	}
+        else
+        {
+            out.print("Por favor, preencha todos os campos!");
+        }
     %>
     </body>
 </html>
